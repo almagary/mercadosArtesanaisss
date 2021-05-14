@@ -1,0 +1,433 @@
+<tamppa:config:_Layout />
+
+<!DOCTYPE html>
+<html ng-app="myApp" ng-controller="_LayoutController" ng-cloak>
+<head>    	
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  	<meta name="google-site-verification" content="IZemAEAcaNrkKjLvCnOBnLVWVw9wT70Umcwjpxqv4OA" />
+    @RenderSection("MetaTagTitle", false)
+  	@RenderSection("MetaKeywords", false)
+    @RenderSection("MetaDescription", false)
+  	<link rel="shortcut icon" type="image/x-icon" href="@(HostName)files/@CurrentUnit.identifier/images/favicon.png" />
+    <tamppa:css:_Layout />
+    <!--Unit Data CSS-->
+    <link href="https://fonts.googleapis.com/css?family=Oswald:300&subset=latin-ext" rel="stylesheet" />
+  	<link href="https://fonts.googleapis.com/css?family=Roboto:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i" rel="stylesheet">
+  	<link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" />
+    <link href="@(HostName)files/@CurrentUnit.identifier/css/site.css" rel="stylesheet" />
+    <link href="@(HostName)files/@CurrentUnit.identifier/css/side-menu.css" rel="stylesheet" />
+    <link href="@(HostName)files/@CurrentUnit.identifier/css/float-cart.css" rel="stylesheet" />
+  	<link href="@(HostName)files/@CurrentUnit.identifier/css/autocomplete.css" rel="stylesheet" />
+    <tamppa:content:PageSize />
+  	<tamppa:content:GoogleTagManager />
+    <!--Render Section-->
+    @RenderSection("StyleSheets", false) 
+</head>
+<body>	
+
+    <tamppa:script:GoogleTagManager />
+  
+    <header>
+        <div class="top-bar text-center">
+          <div class="container">
+            <ul class="list-inline pull-left">
+              <li class="ng-scope">
+                <a class="btn-whats-top" href="https://api.whatsapp.com/send?phone=55439999999" target="_blank"><i class="fa fa-whatsapp"></i> (31) 98904-8736</a>  
+             
+              </li>
+            </ul>
+            
+            <ul class="list-inline pull-right text-right hidden-xs">
+              <li><a href="/customer/space">Quero ser vendedor</a></li>
+             
+            </ul>
+            <ul class="list-inline visible-xs text-center">
+              <li><a href="/customer/space">Quero ser vendedor</a></li>
+            </ul>
+          </div>
+        </div>	 
+        <div class="header-content">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xs-2 visible-xs" style="position: initial;">
+                        <nav id="navMenu" class="navbar">
+                            <div class="navbar-header">
+                                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#menu-top2" aria-expanded="false">
+                                    <span class="sr-only">Toggle navigation</span>
+                                    <span class="menu-bars">
+                                        <span class="icon-bar"></span>
+                                        <span class="icon-bar"></span>
+                                        <span class="icon-bar"></span>
+                                    </span>
+                                </button>
+                            </div>
+                            <div id="menu-top2" class="collapse navbar-collapse" ng-if="departments">
+                                <ul class="nav navbar-nav">
+                                    <li id="menu-item-{{$index}}" ng-repeat="dep in getDepartments(0)" ng-class="(departments | filter:{id_parent:dep.id}).length > 0 && 'dropdown' || ''">
+                                        <a class="nav-item-menu" href="{{dep.url}}">{{dep.name}}</a>
+                                        <a class="nav-item-menu-dropdown" href="#">{{dep.name}} <i class="fa fa-chevron-right" aria-hidden="true"></i></a>
+                                        <ul id="menu-dropdown-item-{{$index}}" ng-if="(departments | filter:{id_parent:dep.id}).length > 0" class="dropdown-mobile">
+                                        	<li class="voltar"><a href="#"><i class="fa fa-chevron-left"></i> Voltar</a></li>
+                                        	<li class="ver-tudo-em"><a href="{{dep.url}}">Ver tudo em {{dep.name}}</a></li>
+                                            <li ng-repeat="cat in getDepartments(dep.id)">
+                                                <a title="{{cat.name}}" href="{{cat.url}}">{{cat.name}}</a>
+                                                <ul ng-if="(departments | filter:{id_parent:cat.id}).length > 0" class="sub-menu">
+                                                    <li ng-repeat="sub in getDepartments(cat.id)">
+                                                        <a title="{{sub.name}}" href="{{sub.url}}">{{sub.name}}</a>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                  	<li class="account-menu-mobile">
+                                    	<a class="nav-item-menu" href="/customer/space/">Minha Conta</a>
+                                	</li>
+                                </ul>
+                            </div>
+                        </nav>
+                	</div>
+                  
+                    <!--Logo e Menu-->
+                    <div class="col-xs-8 col-md-3">
+                        <a href="/home" class="logo">
+                            <img class="img-responsive" title="{{unit.name}}" alt="{{unit.name}}" ng-src="@(HostName)files/{{unit.identifier}}/images/logo.png" />
+                        </a>
+                    </div>
+                  
+                    <div class="col-xs-2 visible-xs cart-mobile">
+                        <div class="content-cart-header">
+                            <!--Button Cart-->
+                            <a class="shopping-cart-button" href="/cart">
+                              	<span id="txt-count-products" class="pull-right badge badge-danger">{{cart._products.length}}</span>
+                   		       	<!-- <i class="fa fa-shopping-cart" aria-hidden="true"></i> -->
+                              	<img class="img-responsive"  alt="Carrinho" ng-src="@(HostName)files/{{unit.identifier}}/images/cart-icon.png" />
+                            </a>
+                		</div>
+                	</div>
+                  
+                    <!--Search-->
+                    <div class="col-xs-12 col-md-6">
+                        <form id="form-search" onsubmit="return Utils.search('txt-search')" role="form" enctype="multipart/form-data">
+                            <input id="txt-search" class="search-input" type="text" placeholder="Digite o que está procurando" autocomplete="off" />
+                            <button id="btn-search" type="submit"><i class="fa fa-search"></i><span> BUSCAR</span></button>
+                        </form>
+                      	<div class="autocompletes-content">
+                        	<div ng-show="queries" class="auto-popular">
+                            	<h3>MAIS BUSCADOS</h3>
+                                <ul>
+                                	<li ng-repeat="q in queries | orderBy:'-points'" ng-if="q.terms">
+                                    	<a title="{{q.terms}}" href="/search?id={{q.terms}}" target="_self">
+                                        	<span>{{$index+1}}</span>
+                                            {{q.terms}}
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div ng-show="suggestions" class="auto-terms">
+                                <ul>
+                             	   <li ng-repeat="s in suggestions">
+                                   <a title="{{s.terms}}" href="/search?id={{s.terms}}" target="_self">
+                                    	   <i class="fa fa-search"></i>
+                                           {{s.terms}}
+                                       </a>
+                                   </li>
+                                </ul>
+                            </div>
+                            <div ng-show="products_searchs" class="auto-products">
+                                <h3>PRODUTOS</h3>
+                                <ul>
+                                    <li ng-repeat="p in products_searchs">
+                                        <a href="{{p.url}}" target="_self">
+                                            <img alt="{{p.name}}" ng-src="{{p.image}}">
+                                            <span class="a-products-info">
+                            	                <span class="a-products-name">
+                                	                {{p.name}}
+                                                </span>
+                                            	<span class="a-products-price">
+                                                	<span ng-show="p.discount">{{p.price | currency:'R$ '}}</span>
+                                                    <br ng-show="p.discount" />
+                                                    <strong ng-show="p.discount">{{p.discount | currency:'R$ '}}</strong>
+                                                    <strong ng-show="!p.discount">{{p.price | currency:'R$ '}}</strong>
+                                                </span>
+                                            </span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <!--Account-->
+                    <div class="col-xs-12 col-md-3 text-right account-box myaccount-cart-content hidden-xs">
+                        <ul class="list-inline acc-menu">
+                          	
+                            <li ng-if="user" class="visitor">
+                            	<a href="/customer/space">{{getfirstname(user.name)}} <img  class="img-responsive" title="" alt="top-home" ng-src="@(HostName)files/{{unit.identifier}}/images/user-icon.png" /></a>
+                            	<ul class="acc-dropdown">
+                            		<li><a href="/customer/space">Minha conta</a></li>
+                            		<li><a href="/customer/orders">Meus pedidos</a></li>
+                            		<li><a href="/customer/addresses">Meus endereços</a></li>
+                            		<li><a href="/customer/logout">@Resources.Exit</a></li>
+                            	</ul>
+                        	</li>
+                            <li ng-if="!user">
+                              <a id="btn-login-principal" data-target="#modal-login-default" data-toggle="modal" href="#">
+                                <img  class="img-responsive" title="" alt="top-home" ng-src="@(HostName)files/{{unit.identifier}}/images/user-icon.png" />
+                              </a>
+                            	<ul class="acc-dropdown">
+                            		<li><a href="/customer/orders">Meus pedidos</a></li>
+                            		<li><a href="/customer/addresses">Meus endereços</a></li>
+                            	</ul>
+                        	</li>
+                        </ul>
+                        <div class="content-cart-header">
+                            <!--Button Cart-->
+                            <a class="shopping-cart-button" href="/cart">
+                              	<span id="txt-count-products" class="pull-right badge badge-danger">{{cart._products.length}}</span>
+                            	<!-- <i class="fa fa-shopping-cart" aria-hidden="true"></i> -->
+                              	<img class="img-responsive"  alt="Carrinho" ng-src="@(HostName)files/{{unit.identifier}}/images/cart-icon.png" />
+                            </a>
+                            <!--Shopping Cart Float-->
+                            <div class="shopping-cart">
+                                <div class="shopping-cart-header">
+                                    <div class="shopping-cart-total">
+                                        <span class="lighter-text">Total:</span>
+                                        <span class="main-color-text">{{cart.total | currency:"@Resources.Currency "}}</span>
+                                    </div>
+                                </div>
+                                <ul class="shopping-cart-items">
+                                    <li ng-if="cart._products.length > 0" ng-repeat="pro in cart._products">
+                                        <div class="item-img">
+                                            <img width="50" class="img-responsive" ng-src="{{pro.image}}" alt="{{pro.name}}" />
+                                        </div>
+                                        <div class="item-infos">
+                                            <span class="item-name">
+                                                {{pro.name}}
+                                            </span><br />
+                                            <span class="item-sku">
+                                                SKU: {{pro.sku}}
+                                            </span><br />
+                                            <span class="item-price">
+                                                {{pro.discount > 0 && pro.discount || pro.price | currency:"@Resources.Currency "}}
+                                            </span>
+                                        </div>
+                                        <div class="item-qtd">
+                                            <input id="number-{{$index}}" type="number" step="1" ng-model="pro.quantity" ng-change="cart_setamount(pro,'#number-'+$index)" class="form-control text-center amount" ng-value="pro.quantity" />
+                                        </div>
+                                        <div class="item-delete">
+                                            <button ng-click="cart_delete(pro.sku)"><i class="fa fa-times"></i></button>
+                                        </div>
+                                    </li>
+                                    <li ng-if="!cart._products.length > 0" class="text-center">
+                                        @Resources.CartNotFound
+                                    </li>
+                                </ul>
+                                <a ng-if="cart._products.length > 0" href="/checkout" class="button">@Resources.Checkout</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="bg-menu hidden-xs">
+            <div class="container-fluid">
+                <nav id="navMenu" class="navbar">
+                    <div class="navbar-header">
+                    	<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#menu-top" aria-expanded="false">
+                        	<span class="sr-only">Toggle navigation</span>
+                            <span class="mobile-menu-title">MENU</span>
+                            <span class="menu-bars">
+                            	<span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                            </span>
+                        </button>
+                    </div>
+                    <div id="menu-top" class="collapse navbar-collapse" ng-if="departments">
+                        <ul class="nav navbar-nav">
+                            <li class="hidee showw"> <a href="#" class="dropdown depart-anchor dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="true">
+                              <i class="fa">&#xf0c9;</i>
+                              <span class="nav-label">Todas Categorias</span></a>
+                              <ul class="dropdown-menu dropp">
+                                <!--  <ul class="dropdown-menu dropp">-->     
+                                <li class="dropdown-submenu" id="menu-item-{{$index}}"
+                                    ng-repeat="dep in getDepartments(0) | orderBy:'position'"
+                                    ng-class="(departments | filter:{id_parent:dep.id}).length > 0 && 'dropdown' || ''">
+                                  <a class="nav-item-menu" href="{{dep.url}}"><span class="dep-icon"
+                                                                                    style="background: url('@(HostName)files/{{unit.identifier}}/icons/{{dep.icon}}');"></span>
+                                    {{dep.name}}</a>
+                                  <ul id="menu-dropdown-item-{{$index}}"
+                                      ng-if="(departments | filter:{id_parent:dep.id}).length > 0"
+                                      class="dropdown-menu dropdown-sub-menu">
+                                    <li ng-repeat="cat in getDepartments(dep.id) | orderBy:'position'" class="dropdown-submenu"> <a title="{{cat.name}}" href="{{cat.url}}">{{cat.name}}</a>
+                                      <ul ng-if="(departments | filter:{id_parent:cat.id}).length > 0" class="dropdown-menu sub-menu">
+                                        <li ng-repeat="sub in getDepartments(cat.id)" class="dropdown-submenu">
+                                          <a title="{{sub.name}}" href="{{sub.url}}">{{sub.name}}</a>
+                                        </li>
+                                      </ul>
+                                    </li>
+                                  </ul>
+                                </li>
+                              </ul>
+                            </li>    
+                            <li> <a href="/customer/login" class=" depart-anchor-2" role="button"
+                                    aria-haspopup="true" aria-expanded="true">
+                             
+                              <span class="nav-label">Moda</span> <span class="caret"></span></a>
+                            </li>  
+                            <li> <a href="/promocoes" class=" depart-anchor-2"  role="button"
+                                    aria-haspopup="true" aria-expanded="true">
+                             
+                              <span class="nav-label">Alimentos</span> <span class="caret"></span></a>
+                            </li>                        
+                            <li> <a href="/customer/wishlist" class=" depart-anchor-2"  role="button"
+                                    aria-haspopup="true" aria-expanded="true">
+                            
+                              <span class="nav-label">Casa</span> <span class="caret"></span></a>
+                            </li>
+                            <li> <a href="/customer/ratings" class=" depart-anchor-2" role="button"
+                                    aria-haspopup="true" aria-expanded="true">
+                             
+                              <span class="nav-label">Cosméticos</span> <span class="caret"></span></a>
+                            </li>
+                            <li> <a href="/customer/orders" class=" depart-anchor-2"  role="button"
+                                    aria-haspopup="true" aria-expanded="true">
+                            
+                              <span class="nav-label">Eco</span> <span class="caret"></span></a>
+                            </li>
+                          	<li id="menu-artesanatos" > <a href="/customer/orders" class=" depart-anchor-2"  role="button"
+                                    aria-haspopup="true" aria-expanded="true">
+                              
+                              <span  class="nav-label">Artesanatos</span> <span class="caret"></span></a>
+                            </li> 
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </header>
+    <!--Body-->
+    <div class="body-content">
+        @RenderBody()
+    </div>   
+    <!-- Footer -->
+    <footer class="bg-footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12 col-md-3">
+                    <h4 class="title-footer-lft">Canais de atendimento</h4>
+                    <div class="text-footer">     
+                      <p><a class="button-social" href="" target="_blank"><i class="fa fa-linkedin" aria-hidden="true"></i> Linkedin</a></p>
+                      <p><a class="button-social" href="" target="_blank"><i class="fa fa-whatsapp" aria-hidden="true"></i> Whatsapp</a></p>
+                      <p><a class="button-social" href="" target="_blank"><i class="fa fa-facebook" aria-hidden="true"></i> Facebook</a></p>
+                      <p><a class="button-social" href="" target="_blank"><i class="fa fa-instagram" aria-hidden="true"></i> Instagram</a></p>
+                      <p><a class="button-social" href="" target="_blank"><i class="fa fa-youtube" aria-hidden="true"></i> Youtube</a></p>             
+                    </div>
+                </div>
+                <div class="col-xs-12 col-md-3">
+                    <h4 class="title-footer-lft">Ajuda</h4>
+                    <div class="text-link-footer" ng-if="pages">
+                        <a ng-repeat="page in pages | filter:{ type: 1 }" class="link-footer" href="{{page.url}}">{{page.name}}</a>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-md-3">
+                    <h4 class="title-footer-lft">Meus pedidos</h4>
+                    <div class="text-link-footer" ng-if="pages">
+                        <a ng-repeat="page in pages | filter:{ type: 2 }" class="link-footer" href="{{page.url}}">{{page.name}}</a>                     
+                    </div>
+                </div>
+                <div class="col-xs-12 col-md-3">
+                  <a href="/home" class="logo" id="bg-footer-logo">
+                    <img class="img-responsive" title="{{unit.name}}" alt="{{unit.name}}" ng-src="@(HostName)files/{{unit.identifier}}/images/logo.png" />
+                  </a>       
+                </div>
+            </div>
+        </div>
+    </footer>  
+	<div class="payment-footer">
+        <div class="container">
+            <h4>PAGAMENTO</h4>
+            <div class="pmt-flags">
+                <img title="Metodos de pagamento" alt="Metodos de pagamento" ng-src="@(HostName)files/{{unit.identifier}}/images/payment.png" />
+            </div>
+            <h4>SEGURANÇA</h4>
+            <div class="selos-seguranca">
+                <a target="_blank" href="https://www.ssllabs.com/ssltest/analyze.html?d=cervejaartesanal.store"><img title="Let's Encrypt" alt="Let's Encrypt" ng-src="@(HostName)files/{{unit.identifier}}/images/lets-encrypt.png" /></a>
+                    	<a target="_blank" href="https://transparencyreport.google.com/safe-browsing/search?url=cervejaartesanal.store"><img style="width: 110px; margin-left: 15px;" title="Google Safe Browsing" alt="Google Safe Browsing" ng-src="@(HostName)files/{{unit.identifier}}/images/google-safe-browsing.png" /></a>
+            </div>
+        </div>
+	</div> 
+    <div class="signature">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12 col-sm-8">
+                    {{unit.name}} Store © @DateTime.Now.Year Todos os direitos reservados.
+                </div>
+                <div class="hidden-xs col-sm-4 text-right">
+                    <a href="http://www.tamppa.com" target="_blank"><img title="Tamppa E-commerce Intelligence" alt="Tamppa E-commerce Intelligence" src="~/content/assets/img/tamppa.png" width="120" /></a>
+                </div>
+                <div class="visible-xs text-center">
+                    <a href="http://www.tamppa.com" target="_blank"><img title="Tamppa E-commerce Intelligence" alt="Tamppa E-commerce Intelligence" src="~/content/assets/img/tamppa.png" width="120" /></a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Login -->
+    <tamppa:login:Default />
+  	<!-- Modal Warn Me -->
+    <div class="modal fade" id="modal-warnme" tabindex="-1" role="dialog" aria-labelledby="modal-warnme" aria-hidden="true" data-backdrop="static" data-keyboard="true">
+        <!-- Close -->
+        <button class="new-modal-close"><i class="fa fa-2x fa-close"></i></button>
+        <!-- Modal dialog -->
+        <div class="modal-dialog new-modal-warnme" role="document">
+            <div class="new-modal-content">
+                <div class="row">
+                    <div class="col-xs-12 col-md-6">
+                        <img class="img-responsive" alt="{{product_warnme.name}}" ng-src="{{product_warnme.cover && product_warnme.cover.url_main || product_warnme.main.url_main}}" />
+                    </div>
+                    <div class="col-xs-12 col-md-6">
+                        <h2>{{product_warnme.name}}</h2>
+                        <br />
+                        <h4>Avise-me!</h4>
+                        <div class="prod-img">
+                            <div ng-if="product_warnme.variations" class="caption-area-variation">
+                                <ul class="caption-variations list-inline" ng-repeat="type in gettypeattrs(product_warnme.variations)">
+                                    <li class="caption-title w-100">{{type.name}}</li>
+                                    <li ng-repeat="attr in getattrs(type.id, product_warnme) | orderBy: 'position'">
+                                        <label ng-click="selectattr(product_warnme, $event)" data-id="{{attr.id}}" data-type="{{type.id}}" style="{{attrbackground(attr.color)}}" class="attribute-button">{{type.has_color && ' ' || attr.name}}</label>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <form id="form-register-warnme" enctype="multipart/form-data" name="formWarnMe" role="form">
+                            <input type="hidden" name="identifier_product" ng-value="product_warnme.identifier" />
+                            <input type="hidden" name="identifier_variation" ng-value="product_warnme.attribute" />
+                            <div class="form-group has-feedback">
+                                <input type="text" placeholder="@Resources.Name" ng-model="model_warnme.name" class="form-control" name="name" required />
+                                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                            </div>
+                            <div class="form-group has-feedback">
+                                <input type="text" placeholder="@Resources.Mail" ng-model="model_warnme.email" class="form-control" name="email" required />
+                                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                            </div>
+                            <div class="form-group has-feedback">
+                                <input id="txt-phone-warnme" type="text" placeholder="@Resources.Phone" ng-model="model_warnme.phone" class="form-control" ng-focus="focusInPhone('#txt-phone-warnme')" ng-blur="focusOutPhone('#txt-phone-warnme')" name="phone" required />
+                                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                            </div>
+                            <button ng-disabled="formWarnMe.$invalid" ng-click="warnMe($event)" type="submit" class="btn btn-success btn-rounded text-2x new-modal-areabutton-in-form" title="@Resources.Save" data-loading-text="<i class='fa fa-spinner fa-spin'></i> @Resources.Loading">&nbsp;&nbsp;@Resources.Send&nbsp;&nbsp;</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Loading -->
+    <div class="loading" style="display:none">@Resources.Loading &#8230;</div>
+    <!-- Scripts -->
+    <tamppa:script:_Layout />
+    @RenderSection("Scripts", false)
+  	<script type="text/javascript">	
+ 	</script>
+  
+</body>
+</html>
