@@ -1,0 +1,423 @@
+<tamppa:config:Product />
+
+@section Scripts{
+    <tamppa:script:Product />
+	<script src="~/content/assets/plugins/jquery.bxslider/jquery.bxslider.min.js"></script>
+	<script type="text/javascript">    	
+        //Auto click
+    	function autoVariationClickProduct(caption, pivot) {
+    		$($(caption).children('.variations').children('label')[pivot]).click();
+        	if (parseInt($(caption).parent('div').children('input[name=amount]').val()) == 0) {
+        		autoVariationClickProduct(caption, pivot + 1);
+        	}
+    	}
+        //Auto click
+    	function autoVariationClick(caption, pivot) {
+    		var data_past = $($(caption)).attr('data-past') === 'true';
+            if (data_past) {
+            	return;
+            } else if ($($(caption).children('li').children('label')[pivot])) {
+            	$($(caption).children('li').children('label')[pivot]).click();
+                setTimeout(function(){ 
+                	var amount = parseInt($(caption).parent('div').children('input[name=amount]').val());
+                	if (amount === 0) {
+        				autoVariationClick(caption, pivot + 1);
+        			} else {                	
+                    	$($(caption)).attr('data-past', true);
+                	}
+                }, 100);                
+            }
+    	}        
+        //Remove ZoomMobile
+        function removeZoomMobile() {
+        	var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ? true : false;            
+            if (isMobile) {
+            	var img = $('#img_01');
+                var removeZoom = setInterval(function() {
+                    if (img.data().elevateZoom && img.data().elevateZoom.zoomContainer) {
+                        img.data().elevateZoom.zoomContainer.remove();
+                        $.removeData(img, 'elevateZoom');
+                        img.unbind();
+                        clearInterval(removeZoom);
+                    }
+                },100);
+            }
+        }        
+        //Ready
+        $(document).ready(function () {        	
+            removeZoomMobile();            
+            /*BRANDS
+            $('#gallery').bxSlider({ 
+            	slideWidth: 80, 
+                minSlides: 3, 
+                maxSlides: 4, 
+                slideMargin: 10 
+            });*/            
+            //auto click variation
+            _.forEach($('.caption-variations'), function (caption) {
+                if ($(caption).children('li').children('label').length > 0) {
+                    autoVariationClick(caption, 0);                    
+                }
+            });
+            //auto click variation product
+            _.forEach($('.caption-attributes'), function (caption) {
+                if ($(caption).children('.variations').children('label').length > 0) {
+                    autoVariationClickProduct(caption, 0);                    
+                }
+            });
+            
+        });
+        
+	</script>
+}
+
+@section MetaTagTitle{
+    <title>@Html.Raw(ViewBag.Title)</title>
+}
+
+@section MetaKeywords{
+    <tamppa:content:MetaKeywords />
+}
+
+@section MetaDescription{
+    <tamppa:content:MetaDescription />
+}
+
+@section StyleSheets{
+	<link href="@(HostName)files/@CurrentUnit.identifier/css/jquery.bxslider.gallery.css" rel="stylesheet" />
+    <style type="text/css">
+        .product-info .section-price .prod-price { margin: 0; margin-bottom: 25px; }
+      	.star-checked { color: orange; cursor: pointer; }
+    </style>
+}
+
+<div class="container hidden-xs">
+    <ol class="breadcrumb" ng-bind-html="htmlRaw(productBreadcrumb(product.name))">            
+	</ol>
+</div>
+<div class="container prod-container">
+    <input type="hidden" id="hid-variation" />
+    <div class="row">
+        <!--List Images-->
+        <div class="col-xs-12 col-md-6 product-images" ng-if="!product.images">
+            <div class="row">
+                <div class="col-xs-12 pull-right">
+                    <img id="img_01" class="img-responsive" ng-src="{{product.image}}" data-zoom-image="{{product.image}}" />
+                </div>
+                <div id="gallery" class="col-xs-12 prod-gallery">
+                    <a href="#" data-image="{{product.image}}" data-zoom-image="{{product.image}}">
+                        <img class="thumb-img img-responsive" width="100" ng-src="{{product.image}}" />
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-12 col-md-6 product-images" ng-if="product.images">
+            <div class="row">
+                <div class="col-xs-12 pull-right">
+                    <img id="img_01" class="img-responsive" ng-src="{{product.image}}" data-zoom-image="{{product.image}}" />
+                	<div class="remove-Zoom-Mobile visible-xs"></div>
+                </div>
+                <div id="gallery" class="col-xs-12 prod-gallery{{product.images.length > 6 && ' gallery-scroll' || ''}}">
+                	<div class="thumb-img" ng-repeat="img in product.images">
+                    	<a class="thumbnail-zoom" data-image="{{img.url_main}}" data-zoom-image="{{img.url_main}}">
+                        	<img ng-src="{{img.url_main}}" class="img-responsive">
+                    	</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--Product Data-->
+        <div class="col-xs-12 col-md-6 product-info">
+            <h1 class="product-title">{{product.name}}</h1>
+          	<h4 class="product-sku">Ref: {{product.sku}}</h4>
+        	<h3 class="short-description">{{product.text_description}}</h3>
+            <br />
+            <!--Points AVG-->
+            <div ng-show="product.points_avg > 0" class="stars-score">
+                <!--1-->
+                <span ng-show="product.points_avg == 1" class="fa fa-2x fa-star star-checked"></span>
+                <span ng-show="product.points_avg == 1" ng-repeat="i in [2,3,4,5]" class="fa fa-2x fa-star"></span>
+                <!--2-->
+                <span ng-show="product.points_avg == 2" ng-repeat="i in [1,2]" class="fa fa-2x fa-star star-checked"></span>
+                <span ng-show="product.points_avg == 2" ng-repeat="i in [3,4,5]" class="fa fa-2x fa-star"></span>
+                <!--3-->
+                <span ng-show="product.points_avg == 3" ng-repeat="i in [1,2,3]" class="fa fa-2x fa-star star-checked"></span>
+                <span ng-show="product.points_avg == 3" ng-repeat="i in [4,5]" class="fa fa-2x fa-star"></span>
+                <!--4-->
+                <span ng-show="product.points_avg == 4" ng-repeat="i in [1,2,3,4]" class="fa fa-2x fa-star star-checked"></span>
+                <span ng-show="product.points_avg == 4" class="fa fa-2x fa-star"></span>
+                <!--5-->
+                <span ng-show="product.points_avg == 5" ng-repeat="i in [1,2,3,4,5]" class="fa fa-2x fa-star star-checked"></span>
+            </div>
+            <div class="prod-price-box">
+                <!--Price-->
+            	<span ng-if="product.discount > 0" class="prod-price-old">De: {{product.price | currency:"@Resources.Currency "}}<br /></span>
+            	<span ng-if="product.discount > 0" class="prod-price">Por: {{product.discount | currency:"@Resources.Currency "}}</span>
+            	<span ng-if="product.discount == 0" class="prod-price">{{product.price | currency:"@Resources.Currency "}}</span>
+            	<!--Or Plots-->
+              	<div class="installment">
+      				<!-- Leve mais pague menos -->
+        			<p ng-show="messageInstallmentCervejaria(product) && product.installment.plots > 1">
+            			{{product.installment.message}} <b>{{product.installment.value | currency:'@Resources.Currency '}}</b>
+        			</p>
+      				<!-- Outros -->
+        			<p ng-show="!messageInstallmentCervejaria(product) && product.installment.plots > 1">
+            			Ou {{product.installment.plots}}x de {{product.installment.value | currency:'@Resources.Currency '}} <!--{{pro.installment.message}}-->
+        			</p>
+    			</div>            	
+            </div>
+            <!--Attributes-->
+            <div ng-if="product.variations" class="prod-variations text-left">
+       <!--    	<button ng-if="product.other_image" type="button" class="btn-medidas pull-right" data-toggle="modal" data-target="#TabelaMedidas">Guia de Medidas</button>  -->
+              	<input type="hidden" name="attribute" ng-value="product.attribute" />
+                <input type="hidden" name="sku" ng-value="product.sku" />
+                <input type="hidden" name="has_stock" ng-value="product.has_stock" />
+                <input type="hidden" name="stock" ng-value="product.stock" />
+                <input type="hidden" name="amount" ng-value="product.amount" />
+                <input type="hidden" name="price_on_request" ng-value="product.price_on_request" />
+                <input type="hidden" name="price" ng-value="product.price" />
+                <input type="hidden" name="discount" ng-value="product.discount" />
+                <input type="hidden" name="date_initial" ng-value="product.date_initial" />
+                <input type="hidden" name="date_final" ng-value="product.date_final" />
+                <div class="caption-attributes" ng-repeat="type in gettypeattrs(product.variations)">
+                    <h3 class="typeattribute-name">{{type.name}}</h3>
+                    <div class="btn-group variations" data-toggle="buttons">
+                        <label ng-repeat="attr in getattrs(type.id, product) | orderBy:'position'" ng-click="selectattr(product, $event)" data-id="{{attr.id}}" data-type="{{type.id}}" 
+                               class="form-checkbox form-icon z-index-1x btn" style="{{attrbackground(attr.color)}}">
+                            {{getAttributeName(type.has_color,attr.name)}}
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <!--Quantity-->
+            <section ng-hide="verifyproduct_warnme(product)" class="prod-quantity">
+                <span class="btn btn-sm btn-default btn-minus" ng-click="productbox_minusamount(product)">
+                    <i class="fa fa-minus"></i>
+                </span>
+                <input type="text" step="1" ng-model="product.quantity" class="text-center txt-quantity" ng-value="product.quantity" ng-readonly="true" />
+                <span class="btn btn-sm btn-default btn-plus" ng-click="productbox_plusamount(product)">
+                    <i class="fa fa-plus"></i>
+                </span>
+            </section>
+            <a class="product-seller"   ng-if="product.seller"  target="_blank" href="/brand/{{product.brand.page}}">
+              <h3>{{product-seller}}</h3>
+            
+            </a>
+            <!--Buy-->
+          	<form id="form-buy" ng-hide="!verifyproduct_buy(product)" role="form" enctype="multipart/form-data">
+                <input type="hidden" name="id" value="@Model.id" />
+                <input type="hidden" name="identifier" value="@Model.identifier" />
+                <input type="hidden" name="sku" value="{{product.sku}}" />
+                <input type="hidden" name="name" value="@Model.name" />
+                <input id="hid-image" type="hidden" name="image" value="@Model.image" />
+                <input type="hidden" name="quantity" value="{{product.quantity}}" />
+                <input type="hidden" name="attribute" value="{{product.attribute}}" />
+                <input id="hid-extra_fields" type="hidden" name="extra_fields" value="" />
+                <button id="btn-buy" type="submit" class="buy-btn">
+                  <i class="fa fa-shopping-cart" aria-hidden="true"></i>   COMPRAR 
+                </button>
+            </form>
+            <a id="btn-warnme" ng-hide="!verifyproduct_warnme(product)" ng-click="setWarnMe(product)">
+                AVISE-ME <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+            </a>
+        	<h3 class="desc-title hidden" ng-if="product.url_youtube">Vídeo</h3>
+            <div id="prod-video" ng-if="product.url_youtube">
+            	<iframe width="100%" height="203" src="https://www.youtube.com/embed/@(Model != null ? Model.url_youtube : "")" frameborder="0" allowfullscreen></iframe>
+            </div>
+        </div>
+        <div class="col-xs-12 product-info">
+            <!--Details-->
+            <div class="description-infos">
+                <h3 class="desc-title" ng-if="product.description">Detalhes</h3>
+                <div id="descricao" ng-if="product.description" ng-bind-html="htmlRaw(product.description)"></div>
+              
+                <h3 class="desc-title" ng-if="product.technical_specification">Saiba mais</h3>
+                <div id="especificacoes" ng-if="product.technical_specification" ng-bind-html="htmlRaw(product.technical_specification)"></div>
+            </div>
+    	</div>
+        <div class="col-xs-12 prod-caracteristicas text-center">
+            <div id="caracteristicas" ng-if="product.characteristics" ng-bind-html="htmlRaw(product.characteristics)"></div>
+    	</div>
+    </div>
+    <br />
+    <!-- PROD RELATEDS -->
+    <div class="row bg-visited prod-relacionados">
+        <div class="bg-title">
+          <hr/>
+          <span>VOCÊ TAMBÉM PODE GOSTAR DE</span>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div ng-if="relations" ng-repeat="pro in relations | orderBy:'-stock'">
+                    <div class="item-prod col-xs-12 col-md-3">
+                        @Html.Partial("_ProductBox")
+                    </div>
+                </div>
+                <div ng-if="!relations">
+                    <br />
+                    <br />
+                    <br />
+                    <p class="text-center records-not-found"><span class="icon">:(</span><span>@Resources.ProductsNotFound</span></p>
+                    <br />
+                    <br />
+                    <br />
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- RATINGS -->
+    <div class="row bg-visited prod-ratings ">
+        <div class="bg-title">
+            <hr />
+            <span ng-if="!product_ratings">SEJA O PRIMEIRO A AVALIAR</span>
+            <span ng-if="product_ratings">AVALIAÇÕES</span>
+        </div>
+        <div class="container">
+            <!--ALL-->
+            <div ng-if="product_ratings" class="row">
+                <div class="col-xs-12">
+                    <button ng-click="newRating(product)" class="btn btn-labeled btn-primary pull-right"><i class="fa fa-hand-pointer-o"></i> Fazer avaliação</button>
+                </div>
+                <hr />
+            </div>
+            <!--FIRST-->
+            <div ng-if="!product_ratings" class="row">
+                <br />
+                <div class="col-xs-12">
+                    <div class="well">
+                        <br />
+                        <i class="fa fa-5x fa-hand-pointer-o center-block text-center"></i>
+                        <div class="center text-center">
+                            <br />
+                            <br />
+                            <p>Seja o primeiro!!!</p>
+                            <br />
+                            <p>Conte para todos o que você achou do produto.</p>
+                            <button ng-click="newRating(product)" class="btn btn-labeled btn-primary"><i class="fa fa-hand-pointer-o"></i> Fazer avaliação</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div ng-if="product_ratings" ng-repeat="rating in product_ratings">
+                <!--LEFT-->
+                <div ng-show="$index % 2 == 0" class="row">
+                    <div  class="col-xs-1">
+                      <!--  <div class="thumbnail">
+                            <img class="img-responsive img-circle" src="https://ssl.gstatic.com/accounts/ui/avatar_2x.png">
+                        </div> -->
+                    </div>
+                    <div class="col-xs-11">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                          <!--<b>{{rating.customer.name}}</b>--> <b>{{getfirstname(user.name)}}</b> <!-- - <strong>{{rating.customer.email}}</strong> --> <span class="text-muted pull-right">{{rating.date_updated | date :  "dd/MM/yyyy"}}</span>
+                            </div>
+                            <div class="panel-body">
+                                <b>{{rating.title}}</b>
+                                <br />
+                                {{rating.comment}}
+                                <br />
+                                <div class="pull-right">
+                                    <!--1-->
+                                    <span ng-if="rating.points == 1" class="fa fa-2x fa-star star-checked"></span>
+                                    <span ng-if="rating.points == 1" ng-repeat="i in [2,3,4,5]" class="fa fa-2x fa-star"></span>
+                                    <!--2-->
+                                    <span ng-if="rating.points == 2" ng-repeat="i in [1,2]" class="fa fa-2x fa-star star-checked"></span>
+                                    <span ng-if="rating.points == 2" ng-repeat="i in [3,4,5]" class="fa fa-2x fa-star"></span>
+                                    <!--3-->
+                                    <span ng-if="rating.points == 3" ng-repeat="i in [1,2,3]" class="fa fa-2x fa-star star-checked"></span>
+                                    <span ng-if="rating.points == 3" ng-repeat="i in [4,5]" class="fa fa-2x fa-star"></span>
+                                    <!--4-->
+                                    <span ng-if="rating.points == 4" ng-repeat="i in [1,2,3,4]" class="fa fa-2x fa-star star-checked"></span>
+                                    <span ng-if="rating.points == 4" class="fa fa-2x fa-star"></span>
+                                    <!--5-->
+                                    <span ng-if="rating.points == 5" ng-repeat="i in [1,2,3,4,5]" class="fa fa-2x fa-star star-checked"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--RIGHT-->
+                <div ng-show="$index % 2 == 1" class="row">
+                    <div class="col-xs-11">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <b>{{rating.customer.name}}</b> - <strong>{{rating.customer.email}}</strong> <span class="text-muted pull-right">{{rating.date_updated | date :  "dd/MM/yyyy"}}</span>
+                            </div>
+                            <div class="panel-body">
+                                <b>{{rating.title}}</b>
+                                <br />
+                                {{rating.comment}}
+                                <br />
+                                <div class="pull-right">
+                                    <!--1-->
+                                    <span ng-if="rating.points == 1" class="fa fa-2x fa-star star-checked"></span>
+                                    <span ng-if="rating.points == 1" ng-repeat="i in [2,3,4,5]" class="fa fa-2x fa-star"></span>
+                                    <!--2-->
+                                    <span ng-if="rating.points == 2" ng-repeat="i in [1,2]" class="fa fa-2x fa-star star-checked"></span>
+                                    <span ng-if="rating.points == 2" ng-repeat="i in [3,4,5]" class="fa fa-2x fa-star"></span>
+                                    <!--3-->
+                                    <span ng-if="rating.points == 3" ng-repeat="i in [1,2,3]" class="fa fa-2x fa-star star-checked"></span>
+                                    <span ng-if="rating.points == 3" ng-repeat="i in [4,5]" class="fa fa-2x fa-star"></span>
+                                    <!--4-->
+                                    <span ng-if="rating.points == 4" ng-repeat="i in [1,2,3,4]" class="fa fa-2x fa-star star-checked"></span>
+                                    <span ng-if="rating.points == 4" class="fa fa-2x fa-star"></span>
+                                    <!--5-->
+                                    <span ng-if="rating.points == 5" ng-repeat="i in [1,2,3,4,5]" class="fa fa-2x fa-star star-checked"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-1">
+                        <div class="thumbnail">
+                            <img class="img-responsive img-circle" src="https://ssl.gstatic.com/accounts/ui/avatar_2x.png">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- TABELA DE MEDIDAS -->
+<div id="TabelaMedidas" class="modal fade" role="dialog" aria-hidden="true" style="display: none;"><div class="modal-dialog"><img ng-if="product.other_image" id="tabela_medida" class="img-responsive" ng-src="{{product.other_image.url}}" /></div></div>
+<!-- Modal Rating -->
+<div id="modal-rating" ng-if="user" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{product.name}}</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <span ng-mouseover="hoverRating(1)" data-value="1" class="fa fa-2x fa-star rating-star-1 star-checked"></span>
+                        <span ng-mouseover="hoverRating(2)" data-value="2" class="fa fa-2x fa-star rating-star-2"></span>
+                        <span ng-mouseover="hoverRating(3)" data-value="3" class="fa fa-2x fa-star rating-star-3"></span>
+                        <span ng-mouseover="hoverRating(4)" data-value="4" class="fa fa-2x fa-star rating-star-4"></span>
+                        <span ng-mouseover="hoverRating(5)" data-value="5" class="fa fa-2x fa-star rating-star-5"></span>
+                    </div>                
+                    <hr />
+                    <div class="col-xs-12">
+                        <form id="form-rating-product" name="formRatingProduct" role="form" enctype="multipart/form-data">
+                            <div class="form-group{{validateFormGroup(formRatingProduct.title.$dirty,formRatingProduct.title.$error)}}">
+                                <input class="form-control" name="title" ng-model="rating.title" placeholder="@Resources.Title" type="text" required />
+                                <div class="data-error" ng-show="formRatingProduct.title.$dirty && formRatingProduct.title.$invalid" ng-messages="formRatingProduct.title.$error">
+                                    <p ng-message="required">@String.Format(Resources.Required2, Resources.Title.ToLower())</p>
+                                </div>
+                            </div>
+                            <div class="form-group{{validateFormGroup(formRatingProduct.comment.$dirty,formRatingProduct.comment.$error)}}">
+                                <textarea class="form-control" name="comment" ng-model="rating.comment" placeholder="@Resources.Comment" rows="5" required></textarea>
+                                <div class="data-error" ng-show="formRatingProduct.comment.$dirty && formRatingProduct.comment.$invalid" ng-messages="formRatingProduct.comment.$error">
+                                    <p ng-message="required">@String.Format(Resources.Required2, Resources.Comment.ToLower())</p>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>                
+            </div>
+            <div class="modal-footer">
+                <button type="button" ng-disabled="formRatingProduct.$invalid" ng-click="saveRating(product,$event)" data-loading-text="<i class='fa fa-spinner fa-spin '></i>" class="btn btn-success">Enviar</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
