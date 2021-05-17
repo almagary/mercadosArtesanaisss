@@ -1,0 +1,476 @@
+
+
+<!DOCTYPE html>
+<html ng-app="myApp" ng-controller="_CheckoutController" ng-cloak>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Meu carrinho</title>
+
+    <link rel="shortcut icon" type="image/x-icon" href="https://s3.sa-east-1.amazonaws.com/tamppa-ecommerce/files/8DBDE540-B5D9-4841-BA1F-FC6D7E47B190/images/favicon.png" />
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous" />
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous" />
+    <link href="/bundles/css?v=cRRaD7UKpSmvB2AxJiQ5SvXLlChpeUKcBKAYSsyrU3U1" rel="stylesheet"/>
+
+    <!--Unit Data CSS-->
+    <link href="https://fonts.googleapis.com/css?family=Oswald:300&subset=latin-ext" rel="stylesheet" />
+  	<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" />
+    <link href="https://s3.sa-east-1.amazonaws.com/tamppa-ecommerce/files/8DBDE540-B5D9-4841-BA1F-FC6D7E47B190/css/site.css" rel="stylesheet" />
+    <!-- Google Tag Manager -->
+    <!--Render Section-->
+    
+	<link href="/content/css/chkoutme.min.css" rel="stylesheet" />
+    <style type="text/css">
+        .cart-title {
+            padding-bottom: 5px;
+            margin-bottom: 5px;
+            border-bottom: 2px solid #555;
+        }
+
+        .cart-hr {
+            margin-top: 5px;
+            margin-bottom: 5px;
+        }
+
+        .cart-row {
+            padding-bottom: 5px;
+            margin-bottom: 5px;
+            border-bottom: 1px solid #CCC;
+        }
+
+        .cart-mini-btn {
+            margin: 3px;
+        }
+
+        .amount-mobile {
+            display: inline;
+            width: 40px !important;
+            height: 25px;
+            width: auto;
+        }
+
+        .prod-price_fidelity {
+            font-size: 10px;
+        }
+
+        .button-transparent {
+            background-color: transparent;
+            border: 0px;
+        }
+
+        .prod-message-error {
+            color: #c11c1c;
+            font-size: 11px;
+        }
+    </style>
+
+</head>
+<body>
+    <!-- Google Tag Manager -->
+    <header>
+        <div class="top-bar-checkout">
+        </div>
+        <div class="header-content-checkout">
+            <div class="container">
+                <div class="row">
+                    <!--Logo-->
+                    <div class="col-xs-4 col-md-3">
+                        <a href="/home">
+                            <img style="width: 120px;" class="img-responsive" title="{{unit.name}}" alt="{{unit.name}}" ng-src="https://s3.sa-east-1.amazonaws.com/tamppa-ecommerce/files/{{unit.identifier}}/images/logo.png" />
+                        </a>
+                    </div>
+                    <div class="col-xs-8 col-md-7 text-right pull-right security-info">
+                        <p class="hidden-xs">Você está em um ambiente 100% seguro.</p>
+                        <a target="_blank" href="https://www.ssllabs.com/ssltest/analyze.html?d={{config.in_production && unit.domain || unit.homolog}}"><img class="ssl-seal" alt="Mercados Artesanais" src="/content/assets/img/bandeiras/let-s-encrypt-gray.png" /></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!--Body-->
+    <div class="body-content">
+        <!-- Content Body -->
+        
+
+
+
+
+
+<div class="container cart-content">
+    <h3>Meu carrinho</h3>
+    <hr />
+    <div ng-if="cart._products.length > 0">
+        <a href="/checkout" class="btn btn-lg btn-success pull-right">Finalizar compra</a>
+        <table id="cart" class="hidden-xs table table-cart">
+            <thead>
+                <tr>
+                    <th>Produto</th>
+                    <th width="10%">Pre&#231;o</th>
+                    <th width="10%" ng-if="config.use_wholesale">Atacado</th>
+                    <th class="text-center" width="10%">Quantidade</th>
+                    <th class="text-center" ng-if="config.is_marketplace" width="10%">Entrega</th>
+                    <th class="text-center" ng-if="config.is_b2b" width="10%">Taxas</th>
+                    <th class="text-center" width="10%">Subtotal</th>
+                    <th width="5%"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="pro in cart._products | orderBy: 'name'">
+                    <td data-th="Produto">
+                        <div class="row">
+                            <div class="col-sm-2 hidden-xs">
+                                <img ng-src="{{pro.image}}" alt="..." class="img-responsive" />
+                            </div>
+                            <div class="col-sm-10">
+                                <h4 class="nomargin">{{pro.name}}</h4>
+                                <p class="prod-variation-cart">{{getVariation(pro.variation)}}</p>
+                                <p class="prod-sku-cart">SKU: {{pro.sku}}</p>
+                                <p ng-show="pro.takemoreLabel" class="prod-sku-cart">Promoção: {{pro.takemoreLabel}}</p>
+                                <p ng-show="pro.extra_fields" ng-repeat="field in pro.extra_fields" class="prod-sku-cart">{{field.name}}: {{field.value}}</p>
+                                <span ng-if="config.use_fidelity && pro.price_fidelity > 0" class="prod-price_fidelity">Pontos de Fidelidade: {{pro.price_fidelity | currency:"P "}}<br /></span>
+                                <p ng-if="pro.seller" class="prod-sku-cart">Vendido e entregue por <a href="/seller/{{pro.seller.url}}"><b><u>{{pro.seller.name}}</u></b></a></p>
+                                <p ng-if="cart.error" class="prod-message-error">{{pro.message_error}}</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td data-th="Pre&#231;o" class="cart-price">
+                        <span ng-if="pro.discount > 0" class="prod-price-old">De: {{pro.price | currency:"R$ "}}<br /></span>
+                        <span ng-if="pro.discount > 0" class="prod-price">Por: {{pro.discount | currency:"R$ "}}</span>
+                        <span ng-if="pro.discount == 0" class="prod-price">{{pro.price | currency:"R$ "}}</span>
+                    </td>
+                    <td data-th="Atacado" class="cart-price" ng-if="config.use_wholesale">
+                        <span class="prod-price">{{pro.price_wholesale | currency:"R$ "}}</span>
+                    </td>
+                    <td data-th="Quantidade" class="text-center">
+                        <button ng-click="minusamount(pro,'#number-'+$index)" class="button-transparent cart-mini-btn fa fa-minus"></button>
+                        <span>{{pro.quantity}}</span>
+                        <button ng-click="plusamount(pro,'#number-'+$index)" class="button-transparent cart-mini-btn fa fa-plus"></button>
+                    </td>
+                    <td class="text-center cart-price" ng-if="config.is_marketplace">
+                        <font ng-if="!pro.shipping.error" size="2">
+                            {{pro.shipping.message}}<br />
+                            {{pro.shipping.value | currency:"R$ "}}
+                        </font>
+                        <font ng-if="pro.shipping.error" size="2" style="color:#c11c1c">
+                            -- N/A --
+                        </font>
+                        <font ng-show="pro.pickup_store" size="1">
+                            <br />
+                            <input type="checkbox" name="is_pickup_store" title="is_pickup_store" ng-model="pro.is_pickup_store" ng-change="setPickupStore(pro)" ng-required="false" /> Retirar na Loja?
+                        </font>
+                    </td>
+                    <td class="text-center cart-price" ng-if="config.is_b2b">
+                        <font size="2">
+                            IPI: {{pro.ipi | currency:"R$ "}}<br />
+                            ST: {{pro.st | currency:"R$ "}}
+                        </font>
+                    </td>
+                    <td data-th="Subtotal" class="text-center cart-price" align="center">
+                        {{getSubtotal(pro.quantity, pro.price, pro.discount) | currency:"R$ "}}
+                    </td>
+                    <td class="actions" data-th="Excluir"><button ng-click="delete(pro.sku)" class="btn-delete center-block"><i class="fa fa-times"></i></button></td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="row visible-xs">
+            <div class="col-xs-12">
+                <div class="cart-title">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <b>Produtos</b>
+                        </div>
+                    </div>
+                </div>
+                <div class="cart-row" ng-repeat="pro in cart._products | orderBy: 'name'">
+                    <!--Row 1-->
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <img ng-src="{{pro.image}}" alt="..." class="img-responsive" />
+                        </div>
+                        <div class="col-xs-9">
+                            <div class="row">
+                                <div class="col-xs-10">
+                                    <b>{{pro.name}}</b>
+                                </div>
+                                <div class="col-xs-2">
+                                    <i ng-click="delete(pro.sku)" class="fa fa-times"></i>
+                                </div>
+                                <div class="col-xs-12">
+                                    {{getVariation(pro.variation)}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--Divider-->
+                    <hr class="cart-hr" />
+                    <!--Row 2-->
+                    <div class="row">
+                        <!--Title-->
+                        <div class="col-xs-4">
+                            Pre&#231;o
+                        </div>
+                        <div class="col-xs-4 text-center">
+                            Quantidade
+                        </div>
+                        <div class="col-xs-4 text-right">
+                            Subtotal
+                        </div>
+                    </div>
+                    <!--Divider-->
+                    <hr class="cart-hr" />
+                    <!--Row 3-->
+                    <div class="row">
+                        <!--Informations-->
+                        <div class="col-xs-4">
+                            <span ng-if="pro.discount > 0" class="prod-price-old">De: {{pro.price | currency:"R$ "}}<br /></span>
+                            <span ng-if="pro.discount > 0" class="prod-price">Por: {{pro.discount | currency:"R$ "}}</span>
+                            <span ng-if="pro.discount == 0" class="prod-price">{{pro.price | currency:"R$ "}}</span>
+                        </div>
+                        <div class="col-xs-4 text-center">
+                            <i ng-click="minusamount(pro,'#number-'+$index)" class="cart-mini-btn fa fa-minus"></i>
+                            <input id="number-{{$index}}" type="number" step="1" ng-model="pro.quantity" ng-change="setamount(pro,'#number-'+$index)" class="form-control text-center amount-mobile amount" ng-value="pro.quantity" />
+                            <i ng-click="plusamount(pro,'#number-'+$index)" class="cart-mini-btn fa fa-plus"></i>
+                        </div>
+                        <div class="col-xs-4 text-right">
+                            <span class="prod-price">{{getSubtotal(pro.quantity, pro.price, pro.discount) | currency:"R$ "}}</span>
+                        </div>
+                    </div>
+                    <!--Divider-->
+                    <hr ng-if="config.is_marketplace" class="cart-hr" />
+                    <!--Row 4-->
+                    <div ng-if="config.is_marketplace" class="row">
+                        <div class="col-xs-4 text-left">
+                            Entrega
+                        </div>
+                        <div ng-if="!pro.shipping.error" class="col-xs-4 text-center">
+                            <b>{{pro.shipping.message}}</b>
+                        </div>
+                        <div ng-if="!pro.shipping.error" class="col-xs-4 text-right">
+                            {{pro.shipping.value | currency:"R$ "}}
+                        </div>
+                        <font ng-if="pro.shipping.error" size="2" style="color:#c11c1c">
+                            -- N/A --
+                        </font>
+                        <font ng-show="pro.pickup_store" size="1">
+                            <br />
+                            <input type="checkbox" name="is_pickup_store" title="is_pickup_store" ng-model="pro.is_pickup_store" ng-change="setPickupStore(pro)" ng-required="false" /> Retirar na Loja?
+                        </font>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row footer-cart">
+            <!--Coupon-->
+            <div class="col-xs-12 col-md-3">
+                <h5><i class="fa fa-tag"></i>&nbsp;&nbsp;Cupom de desconto</h5>
+                <hr />
+                <div class="form-inline row">
+                    <form id="form-register-coupon" name="formCoupon" role="form" enctype="multipart/form-data">
+                        <div class="form-group form-group-inline-left col-xs-12 col-md-8">
+                            <input id="txt-coupon" type="text" class="form-control w-100" name="coupon" ng-minlength="6" ng-maxlength="6" placeholder="Cupom" required />
+                        </div>
+                    </form>
+                    <div class="form-group form-group-inline-right col-xs-12 col-md-4">
+                        <button ng-if="!cart.coupon" class="btn btn-success btn-block" ng-disabled="formCoupon.$invalid" ng-click="getCoupon($event)" data-loading-text="<i class='fa fa-spinner fa-spin'></i>">Enviar</button>
+                        <button ng-if="cart.coupon" class="btn btn-danger btn-block" ng-click="clearCoupon($event)" data-loading-text="<i class='fa fa-spinner fa-spin'></i>">Limpar</button>
+                    </div>
+                </div>
+            </div>
+            <!--Freight-->
+            <div class="col-xs-12 col-md-4">
+                <h5><i class="fa fa-truck"></i>&nbsp;&nbsp;Frete</h5>
+                <hr />
+                <div class="form-group">
+                    <input id="txt-postal_code" type="text" class="form-control w-100" name="postal_code" ng-model="postal_code" ng-value="postal_code" ng-change="calcFreights()" ng-minlength="9" ng-maxlength="9" placeholder="CEP" required />
+                    <div class="data-error" ng-if="formGetFreights.postal_code.$dirty" ng-messages="formGetFreights.postal_code.$error">
+                        <p ng-message="minlength">M&#225;ximo de 9 caract&#233;res</p>
+                    </div>
+                </div>
+                <div id="filterFreights" ng-if="freights" class="radio">
+                    <label ng-repeat="freight in freights | orderBy:'code'" id="lbl-freight-{{freight.code}}" class="form-radio caption-freight col-xs-12 form-normal" data-toggle="tooltip" data-placement="top" title="{{freight.name}}" ng-click="selectFreight($event)">
+                        <input type="radio" data-type="freight" ng-checked="validateFreight(freight, currentShipping)" data-code="{{freight.id}}" data-scheduling="{{freight.scheduling_code}}" data-value="{{freight.value}}" name="freight_selector" />
+                        <img width="40%" class="card-selector" ng-src="{{freight.image}}" />&nbsp;&nbsp;{{freight.value | currency:'R$ '}} até {{freight.message}}
+                    </label>
+                </div>
+            </div>
+            <!--Resume-->
+            <div class="col-xs-12 col-md-5">
+                <h5 class="text-right">Subtotal <b>{{ cart.subtotal | currency:"R$ "}}</b></h5>
+                <h5 ng-if="config.use_wholesale" class="text-right">Subtotal Atacado <b>{{ cart.subtotal_wholesale | currency:"R$ "}}</b></h5>
+                <h5 ng-if="cart.coupon" class="text-right">Cupom <b>&minus; {{cart.coupon}}</b></h5>
+                <h5 class="text-right">Desconto <b>&minus; {{ cart.discount | currency:"R$ "}}</b></h5>
+                <h5 class="text-right">Frete <b>{{ cart.freight | currency:"R$ "}}</b></h5>
+                <h5 ng-if="config.is_b2b" class="text-right">IPI <b>{{ cart.ipi | currency:"R$ "}}</b></h5>
+                <h5 ng-if="config.is_b2b" class="text-right">ST <b>{{ cart.st | currency:"R$ "}}</b></h5>
+                <h3 ng-if="!config.use_wholesale" class="text-right">Total <b>{{ cart.total | currency:"R$ "}}</b></h3>
+                <h3 ng-if="config.use_wholesale" class="text-right">Total <b>{{ (cart.subtotal_wholesale > config.minimum_wholesale_value && cart.total_wholesale || cart.total) | currency:"R$ "}}</b></h3>
+                <p class="text-right" ng-if="parcelling.plots > 1">Ou <b>{{parcelling.plots}}x</b> de <b>{{parcelling.value | currency:"R$ "}}</b> {{parcelling.message}}</p>
+                <br />
+                <a href="/checkout" class="btn btn-lg btn-success pull-right">Finalizar compra</a>
+                <a href="/home" class="btn btn-lg keep-shopping btn-warning pull-right">Continuar comprando</a>
+                <br />
+            </div>
+        </div>
+    </div>
+    <div ng-if="!cart._products.length > 0">
+        <br />
+        <br />
+        <br />
+        <p class="text-center records-not-found"><span class="icon">:(</span><span>Carrinho vazio</span></p>
+        <br />
+        <br />
+        <br />
+    </div>
+    <div ng-if="cart.error" class="row">
+        <div ng-if="cart.message_error" class="col-md-12">
+            <div class="alert alert-danger fade in alert-dismissible">
+                <a href="#" class="close" data-dismiss="alert" aria-label="close" title="close">×</a>
+                <strong>Aviso!</strong>
+                <p ng-bind-html="renderHtml(cart.message_error)"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    </div>
+    <!-- Footer -->
+    <footer class="bg-footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12 col-md-3">
+                    <h4 class="title-footer-lft">ATENDIMENTO</h4>
+                    <div class="text-footer">
+                    	<p>Segunda à sexta-feira.<br>Das 8:00 - 11:30 e das 13:30 - 17:00</p>
+                        <p><i class="fa fa-phone"></i>&nbsp;&nbsp;{{unit.phone}}</p>
+                        <p><i class="fa fa-whatsapp"></i>&nbsp;&nbsp;(43) 9865-9384</p>
+                        <p><i class="fa fa-envelope-o"></i>&nbsp;&nbsp;<a ng-href="mailto:{{unit.contact_person}}" target="_top">{{unit.contact_person}}</a></p>
+                    	<p>Rua Quintino Bocaiuva, 180 Ed. Telmar<br>Sala 202 - Londrina - PR - CEP 86020919</p>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-md-3">
+                    <h4 class="title-footer-lft">Institucional</h4>
+                    <div class="text-link-footer" ng-if="pages">
+                        <a ng-repeat="page in pages | filter:{ removed: false, type: 1 }" class="link-footer" href="{{page.url}}">{{page.name}}</a>
+                    </div>
+                    <h4 class="title-footer-lft">SIGA A REVERBCITY!</h4>
+                    <div class="text-link-footer" ng-ig="socials">
+                        <a ng-repeat="rede in socials" class="button-social" href="{{rede.url}}"><i class="fa {{rede.image_icon}}" aria-hidden="true"></i></a>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-md-3">
+                    <h4 class="title-footer-lft">DÚVIDAS</h4>
+                    <div class="text-link-footer" ng-if="pages">
+                        <a ng-repeat="page in pages | filter:{ removed: false, type: 2 }" class="link-footer" href="{{page.url}}">{{page.name}}</a>
+                        <a class="link-footer" href="/contact">Fale conosco</a>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-md-3">
+                    <h4 class="title-footer-lft">PAGAMENTO E SEGURANÇA</h4>
+                    <div class="text-link-footer">
+                        <img title="Metodos de Pagamento" alt="Metodos de Pagamento - Visa, Mastercard, Dinners, American Express, Elo, Boleto Bancário" ng-src="https://s3.sa-east-1.amazonaws.com/tamppa-ecommerce/files/{{unit.identifier}}/images/bandeiras.png" />
+                    </div>
+                    <div class="text-link-footer">
+                    	<a target="_blank" href="https://www.ssllabs.com/ssltest/analyze.html?d={{config.in_production && unit.domain || unit.homolog}}" style="text-decoration: none;">
+                        	<span class="selo-lets-encrypt"></span>
+                    	</a>
+                        <a class="selo-google" href="https://google.com/safebrowsing/diagnostic?hl=pt-PT&amp;site=https://reverbcity.com" target="_blank">
+                        	<span class="selo-google-img"></span>
+                    	</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <div class="signature">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12 col-sm-8">
+                    {{unit.name}} © 2021 Todos os direitos reservados. CNPJ: {{unit.cnpj}}
+                </div>
+                <div class="hidden-xs col-sm-4 text-right">
+                    <a title="Tamppa E-commerce Intelligence" alt="Tamppa E-commerce Intelligence" href="http://www.tamppa.com.br" target="_blank"><span class="logo-tamppa"></span></a>
+                </div>
+                <div class="visible-xs text-center">
+                    <a title="Tamppa E-commerce Intelligence" alt="Tamppa E-commerce Intelligence" href="http://www.tamppa.com.br" target="_blank"><span class="logo-tamppa"></span></a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <button id="scroll-top" class="btn">
+        <i class="fa fa-chevron-up"></i>
+    </button>
+    <!-- Loading -->
+    <div class="loading" style="display:none">Carregando &#8230;</div>
+    <!-- Script -->
+    <!-- Properties -->
+    <script type="text/javascript">
+        window.properties = { paymentmethods: null, config: {"id":0,"identifier":null,"id_unit":0,"unit":{"id":0,"identifier":null,"name":null,"company_name":null,"state_registration":null,"document":null,"phone":null,"address":null,"number":0,"postal_code":null,"complement":null,"local_neighborhood":null,"email":null,"domain":null,"homolog":null,"port":0,"contact_person":null,"registration_date":"0001-01-01T00:00:00","is_active":false,"id_parent":0,"removed":false,"is_agency":false,"city":null,"state":null,"country":null},"url":null,"logo":"https://s3.sa-east-1.amazonaws.com/tamppa-ecommerce/files/8DBDE540-B5D9-4841-BA1F-FC6D7E47B190/logo/main-logo.jpg","minilogo":"https://s3.sa-east-1.amazonaws.com/tamppa-ecommerce/files/8DBDE540-B5D9-4841-BA1F-FC6D7E47B190/logo/main-logo.jpg","use_smtp_config":false,"smtp_server":null,"smtp_login":null,"smtp_pass":null,"smtp_port":0,"smtp_ssl":false,"smtp_from":null,"use_google_api":false,"google_mail":null,"google_pass":"224914933197-rb78kkip8esa6hkph7v2m0gashlskbev.apps.googleusercontent.com","google_key":"vJ-WG7-n38s3AwMzsD1gtUVJ","google_product_category":null,"google_tag_manager":null,"use_facebook_api":false,"facebook_api":"342891369445782","use_instagram_api":false,"instagram_nickname":null,"instagram_user_id":null,"instagram_access_token":null,"instagram_template":null,"path_inetpub":null,"path_inetpub_homolog":null,"type_template":"box-center","limit_products":20,"height_picture_prod":0,"width_picture_prod":0,"in_production":false,"is_marketplace":true,"use_memcached":false,"seo_tag_title":null,"seo_meta_description":null,"seo_meta_keywords":null,"free_parcelling":0,"interest_parcelling":0,"percentage_interest":0.00,"min_value":0.00,"home_random":false,"protected_environment":false,"api_key":null,"use_fidelity":false,"amazon_region":null,"amazon_bucket_name":null,"amazon_key_id":null,"amazon_secretkey":null,"amazon_root":null,"amazon_security_root":null,"is_b2b":false,"control_shipping":false,"name_shipping":null,"mail_shipping":null,"multiplication_shipping":0.0,"break_into_packets":false,"use_whatsapp_api":false,"whatsapp_number":null,"whatsapp_message":null,"use_talkto_api":false,"talkto_script":null,"use_jivochat_api":false,"jivochat_script":null,"use_contingency":false,"use_wholesale":false,"minimum_wholesale_value":0.00} }
+        window.request = { root: 'https://s3.sa-east-1.amazonaws.com/tamppa-ecommerce/', identifier: '8DBDE540-B5D9-4841-BA1F-FC6D7E47B190' }
+    </script>
+    <!-- Script -->
+    <script src="/bundles/scripts?v=keOiAfGSbUQSd_cknVV_Tm7mDL1MvkbgrTOJM4Pj9G81"></script>
+
+    <!-- AngularJS -->
+    <script type="text/javascript" src="/content/assets/angular-1.6.0/angular.min.js?v=20190709_171436"></script>
+    <script type="text/javascript" src="/content/assets/angular-1.6.0/angular-animate.min.js?v=20190709_171436"></script>
+    <script type="text/javascript" src="/content/assets/angular-1.6.0/angular-messages.min.js?v=20190709_171436"></script>
+    <script type="text/javascript" src="/content/assets/angular-1.6.0/ui-bootstrap-tpls.min.js?v=20190709_171436"></script>
+    <script type="text/javascript" src="/content/assets/angular-1.6.0/angular-facebook.min.js?v=20190709_171436"></script>
+    <script type="text/javascript" src="/content/assets/angular-1.6.0/angular-google-plus.min.js?v=20190709_171436"></script>
+    <script type="text/javascript" src="/content/assets/angular-1.6.0/angular-locale_pt-br.min.js?v=20190709_171436"></script>
+    <script type="text/javascript" src="/scripts/_smart-checkout-controller.js?v=20210117_100518"></script>
+    <!-- Functionals -->
+    <script type="text/javascript">
+        $(document).ready(function () {
+            angular.element("[ng-controller='_CheckoutController']").scope().$apply(function (scope) {
+                scope.unit = {"id":120,"identifier":"8DBDE540-B5D9-4841-BA1F-FC6D7E47B190","name":"Mercados Artesanais","company_name":"L L C M COELHO MERCADOS ARTESANAIS","state_registration":"ISENTO","document":"30.429.017/0001-20","phone":"(99) 9999-9999","address":"Rua Itacolomi","number":968,"postal_code":"35400-000","complement":"","local_neighborhood":"Centro","email":"contato@mercadosartesanais.com.br","domain":"mercadosartesanais.com.br","homolog":"mercadosartesanais.tamppa.com.br","port":80,"contact_person":"contato@mercadosartesanais.com.br","registration_date":"2021-04-29T00:00:00","is_active":true,"id_parent":2,"removed":false,"is_agency":false,"city":"Ouro Preto","state":"MG","country":"BR"};
+                scope.user = null;
+                scope.config = {"id":0,"identifier":null,"id_unit":0,"unit":{"id":0,"identifier":null,"name":null,"company_name":null,"state_registration":null,"document":null,"phone":null,"address":null,"number":0,"postal_code":null,"complement":null,"local_neighborhood":null,"email":null,"domain":null,"homolog":null,"port":0,"contact_person":null,"registration_date":"0001-01-01T00:00:00","is_active":false,"id_parent":0,"removed":false,"is_agency":false,"city":null,"state":null,"country":null},"url":null,"logo":"https://s3.sa-east-1.amazonaws.com/tamppa-ecommerce/files/8DBDE540-B5D9-4841-BA1F-FC6D7E47B190/logo/main-logo.jpg","minilogo":"https://s3.sa-east-1.amazonaws.com/tamppa-ecommerce/files/8DBDE540-B5D9-4841-BA1F-FC6D7E47B190/logo/main-logo.jpg","use_smtp_config":false,"smtp_server":null,"smtp_login":null,"smtp_pass":null,"smtp_port":0,"smtp_ssl":false,"smtp_from":null,"use_google_api":false,"google_mail":null,"google_pass":"224914933197-rb78kkip8esa6hkph7v2m0gashlskbev.apps.googleusercontent.com","google_key":"vJ-WG7-n38s3AwMzsD1gtUVJ","google_product_category":null,"google_tag_manager":null,"use_facebook_api":false,"facebook_api":"342891369445782","use_instagram_api":false,"instagram_nickname":null,"instagram_user_id":null,"instagram_access_token":null,"instagram_template":null,"path_inetpub":null,"path_inetpub_homolog":null,"type_template":"box-center","limit_products":20,"height_picture_prod":0,"width_picture_prod":0,"in_production":false,"is_marketplace":true,"use_memcached":false,"seo_tag_title":null,"seo_meta_description":null,"seo_meta_keywords":null,"free_parcelling":0,"interest_parcelling":0,"percentage_interest":0.00,"min_value":0.00,"home_random":false,"protected_environment":false,"api_key":null,"use_fidelity":false,"amazon_region":null,"amazon_bucket_name":null,"amazon_key_id":null,"amazon_secretkey":null,"amazon_root":null,"amazon_security_root":null,"is_b2b":false,"control_shipping":false,"name_shipping":null,"mail_shipping":null,"multiplication_shipping":0.0,"break_into_packets":false,"use_whatsapp_api":false,"whatsapp_number":null,"whatsapp_message":null,"use_talkto_api":false,"talkto_script":null,"use_jivochat_api":false,"jivochat_script":null,"use_contingency":false,"use_wholesale":false,"minimum_wholesale_value":0.00};
+                scope.typeattributes = null;
+                scope.cards = [];
+                scope.pages = [];
+                scope.socials = null;
+                scope.pages = [];
+                scope.first_billet = null;
+                scope.first_paymentmethod = null;
+            });
+        });
+    </script>
+    
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var zipcode = '86062-030';
+            angular.element("[ng-controller='_CheckoutController']").scope().$apply(function (scope) {
+                scope.cart = {"id":107062,"identifier":"A85DDEAA-FF67-4532-B3D6-70A310736F10","id_unit":120,"unit":{"id":120,"identifier":null,"name":null,"company_name":null,"state_registration":null,"document":null,"phone":null,"address":null,"number":0,"postal_code":null,"complement":null,"local_neighborhood":null,"email":null,"domain":null,"homolog":null,"port":0,"contact_person":null,"registration_date":"0001-01-01T00:00:00","is_active":false,"id_parent":0,"removed":false,"is_agency":false,"city":null,"state":null,"country":null},"id_customer":null,"products":"[{\"price_wholesale\":0.00,\"id\":120978,\"identifier\":\"8661717C-4AAC-4531-A2CF-9D448975AF5C\",\"id_unit\":120,\"attribute\":null,\"sku\":\"123458\",\"sku_aux\":null,\"tags\":null,\"name\":\"Caminho de mesa Crochê (teste)\",\"text_description\":null,\"is_new\":false,\"featured\":false,\"image\":\"https://s3.sa-east-1.amazonaws.com/tamppa-ecommerce/files/8DBDE540-B5D9-4841-BA1F-FC6D7E47B190/products/8661717C-4AAC-4531-A2CF-9D448975AF5C/photos/main-D26670FF-23AF-49C1-9EC5-D6ACBD0F2B97-image.jpg\",\"has_stock\":false,\"stock\":0,\"minimum_quantity\":0,\"amount\":0,\"quantity\":1,\"has_price\":false,\"price_on_request\":false,\"price_subsidized_delivery_unit\":0.00,\"price_subsidized_delivery\":0.00,\"price_fidelity\":0.0,\"price\":12.00,\"discount\":10.00,\"price_cost\":null,\"price_aux\":0.0,\"discount_aux\":0.0,\"date_initial\":null,\"date_final\":null,\"date_manufacture\":null,\"url\":null,\"free_delivery\":false,\"url_youtube\":null,\"seo_tag_title\":null,\"seo_meta_description\":null,\"seo_meta_keywords\":null,\"google_product_category\":null,\"description\":null,\"characteristics\":null,\"technical_specification\":null,\"width\":0.0,\"height\":0.0,\"weight\":1.0,\"diameter\":0.0,\"length\":0.0,\"brand\":null,\"other_image\":null,\"variation\":null,\"variations\":null,\"images\":null,\"images_aux\":null,\"departments\":null,\"filters\":null,\"is_simple\":false,\"is_active\":false,\"removed\":false,\"GTIN\":null,\"MPN\":null,\"NCM\":\"\",\"EAN\":null,\"amount_warnme\":0,\"main\":null,\"cover\":null,\"installment\":null,\"seller\":null,\"shipping\":null,\"is_pickup_store\":false,\"pickup_store\":null,\"variation_text\":null,\"visits\":0,\"position\":0,\"additional_time\":0,\"points_avg\":0,\"ipi\":0.0,\"st\":0.0,\"extra_fields\":[],\"error\":false,\"message_error\":\"\",\"is_signature\":false,\"takemorePayless\":[],\"takemoreLabel\":null}]","_products":[{"price_wholesale":0.00,"id":120978,"identifier":"8661717C-4AAC-4531-A2CF-9D448975AF5C","id_unit":120,"attribute":null,"sku":"123458","sku_aux":null,"tags":null,"name":"Caminho de mesa Crochê (teste)","text_description":null,"is_new":false,"featured":false,"image":"https://s3.sa-east-1.amazonaws.com/tamppa-ecommerce/files/8DBDE540-B5D9-4841-BA1F-FC6D7E47B190/products/8661717C-4AAC-4531-A2CF-9D448975AF5C/photos/main-D26670FF-23AF-49C1-9EC5-D6ACBD0F2B97-image.jpg","has_stock":false,"stock":0,"minimum_quantity":0,"amount":0,"quantity":1,"has_price":false,"price_on_request":false,"price_subsidized_delivery_unit":0.00,"price_subsidized_delivery":0.00,"price_fidelity":0.0,"price":12.00,"discount":10.00,"price_cost":null,"price_aux":0.0,"discount_aux":0.0,"date_initial":null,"date_final":null,"date_manufacture":null,"url":null,"free_delivery":false,"url_youtube":null,"seo_tag_title":null,"seo_meta_description":null,"seo_meta_keywords":null,"google_product_category":null,"description":null,"characteristics":null,"technical_specification":null,"width":0.0,"height":0.0,"weight":1.0,"diameter":0.0,"length":0.0,"brand":null,"other_image":null,"variation":null,"variations":null,"images":null,"images_aux":null,"departments":null,"filters":null,"is_simple":false,"is_active":false,"removed":false,"GTIN":null,"MPN":null,"NCM":"","EAN":null,"amount_warnme":0,"main":null,"cover":null,"installment":null,"seller":null,"shipping":null,"is_pickup_store":false,"pickup_store":null,"variation_text":null,"visits":0,"position":0,"additional_time":0,"points_avg":0,"ipi":0.0,"st":0.0,"extra_fields":[],"error":false,"message_error":"","is_signature":false,"takemorePayless":[],"takemoreLabel":null}],"created_in":"2021-05-17T10:48:27.473","updated_in":"2021-05-17T10:48:27.473","expires_in":"2021-05-24T10:49:59.44","created":"17/05/2021 10:48:27","updated":"17/05/2021 10:48:27","expires":"24/05/2021 10:49:59","session_id":"h5fbtay400bihc20mnagyk1z","user_host_address":"2804:14d:882:902f:5cfc:de4e:af2:cc18","user_host_name":"2804:14d:882:902f:5cfc:de4e:af2:cc18","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36","abandoned":false,"buyed":false,"subtotal":10.00,"total":10.0,"subtotal_wholesale":0.00,"total_wholesale":0.0,"discount":0.00,"discount_promotion":0.00,"interest":0.00,"ipi":0.00,"st":0.00,"freight":0.00,"freight_code":"0","freight_label":" 0 dias úteis","scheduling_code":null,"zipcode":"86062-030","coupon":"","error":false,"message_error":null,"email":null};
+                scope.chkoutme = null;
+                scope.postal_code = scope.cart.zipcode;
+                scope.discount = 0.00;
+                scope.coupon = '';
+                console.log(scope.coupon);
+                if (scope.coupon) {
+                    setTimeout(function () {
+                        $('#txt-coupon').val(scope.coupon);
+                    }, 100);
+                }
+                if (!_.isEmpty(scope.postal_code)) {
+                    scope.getFreights(0);
+                }
+                scope.totalParcelling();
+            });
+            if ($('#txt-postal_code')) {
+                $('#txt-postal_code').mask('99999-999');
+            }
+            if(!_.isEmpty(zipcode)) {
+                $('#txt-postal_code').val(zipcode);
+                angular.element("[ng-controller='_CheckoutController']").scope().$apply(function (scope) {
+                    scope.calcFreights();
+                });
+            }
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+    </script>
+
+</body>
+</html>
