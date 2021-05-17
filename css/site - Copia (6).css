@@ -1532,14 +1532,12 @@ a#bg-footer-logo {
 
 #navMenu .dropdown-menu {
     border: 0;
-    /* width: 100%; */
-    min-width: 18rem;
-    left: 23em;
+    width: 100%;
 }
 
 #navMenu .dropdown-menu>li {
-    /* float: left; */
-    /* width: 16.6%; */
+    float: left;
+    width: 16.6%;
 }
 
 #menu-item-6,
